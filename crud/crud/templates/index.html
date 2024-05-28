@@ -1,0 +1,288 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRUD Application</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: Arial, sans-serif;
+        }
+        .header {
+            background-color: #007bff;
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 30px;
+            position: relative;
+        }
+        .header h1 {
+            display: inline-block;
+            margin-right: 20px;
+        }
+        .logout-btn {
+            position: absolute;
+            top: 50%;
+            right: 20px;
+            transform: translateY(-50%);
+        }
+        .form-section {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+        .table-section {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .table-section table {
+            width: 100%;
+        }
+        .table-section th, .table-section td {
+            text-align: center;
+            vertical-align: middle;
+        }
+        .btn-back {
+            background-color: #6c757d;
+            border-color: #6c757d;
+        }
+        .search-form {
+            margin-bottom: 20px;
+        }
+        .search-form .input-group {
+            width: 100%;
+        }
+        .search-form .form-control {
+            border-radius: 5px 0 0 5px;
+        }
+        .search-form .btn {
+            border-radius: 0 5px 5px 0;
+        }
+    </style>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+</head>
+<body>
+    <div class="header">
+        <a href="{% url 'logout' %}" class="btn btn-light logout-btn">Logout</a>
+        CRUD Application
+    </div>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-section">
+                    <form id="formid" action="" method="post" novalidate>
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="id_first_name" class="form-label">First Name</label>
+                            {{ form.first_name }}
+                            {% if form.first_name.errors %}
+                            <div class="alert alert-danger mt-2">{{ form.first_name.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="mb-3">
+                            <label for="id_last_name" class="form-label">Last Name</label>
+                            {{ form.last_name }}
+                            {% if form.last_name.errors %}
+                            <div class="alert alert-danger mt-2">{{ form.last_name.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="mb-3">
+                            <label for="id_email" class="form-label">Email</label>
+                            {{ form.email }}
+                            {% if form.email.errors %}
+                            <div class="alert alert-danger mt-2">{{ form.email.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="mb-3">
+                            <label for="id_phone" class="form-label">Phone No</label>
+                            {{ form.phone }}
+                            {% if form.phone.errors %}
+                            <div class="alert alert-danger mt-2">{{ form.phone.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="mb-3">
+                            <label for="id_city" class="form-label">City</label>
+                            {{ form.city }}
+                            {% if form.city.errors %}
+                            <div class="alert alert-danger mt-2">{{ form.city.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="d-grid gap-2 mt-3">
+                            <input type="submit" value="Submit" class="btn btn-primary">
+                            <a href="{% url 'home' %}" class="btn btn-back">Back to Home</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="table-section">
+                    <div class="alert alert-primary" role="alert">
+                        Customer Information Detail
+                    </div>
+                    <div class="table-responsive">
+                        <table id="tableid" class="table table-bordered table-hover">
+                            <form action="{% url 'home' %}" method="GET" class="search-form">
+                                <div class="input-group mb-3">
+                                    <input type="text" name="id" class="form-control" placeholder="Search by ID...">
+                                    <button type="submit" class="btn btn-primary">Search</button>
+                                </div>
+                            </form>
+                            <thead class="table-primary">
+                                <tr>
+                                    <th scope="col">ID</th>
+                                    <th scope="col">First Name</th>
+                                    <th scope="col">Last Name</th>
+                                    <th scope="col">Email</th>
+                                    <th scope="col">Phone No</th>
+                                    <th scope="col">City</th>
+                                    <th scope="col">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbodyid">
+                                {% csrf_token %}
+                                {% for s in row %}
+                                <tr>
+                                    <th scope="row">{{ s.id }}</th>
+                                    <td>{{ s.first_name }}</td>
+                                    <td>{{ s.last_name }}</td>
+                                    <td>{{ s.email }}</td>
+                                    <td>{{ s.phone }}</td>
+                                    <td>{{ s.city }}</td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <button type="button" class="btn btn-primary btn_edit" data-sid="{{ s.id }}">Edit</button>
+                                            <button type="button" class="btn btn-danger btn_del" data-sid="{{ s.id }}">Delete</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        $(document).ready(function() {
+            $('#formid').on('submit', function(e) {
+                e.preventDefault();
+                var fn = $("#id_first_name").val().trim();
+                var ln = $("#id_last_name").val().trim();
+                var em = $("#id_email").val().trim();
+                var pn = $("#id_phone").val().trim();
+                var cy = $("#id_city").val().trim();
+                var recordId = $("#formid").data('record-id');
+                var csrfToken = $("input[name='csrfmiddlewaretoken']").val();
+    
+                if (fn === "" || ln === "" || em === "" || pn === "" || cy === "") {
+                    alert("Please fill in all fields");
+                } else {
+                    var mydata = {
+                        first_name: fn,
+                        last_name: ln,
+                        email: em,
+                        phone: pn,
+                        city: cy,
+                        csrfmiddlewaretoken: csrfToken
+                    };
+    
+                    var url = '{% url "home" %}';
+                    if (recordId) {
+                        url = '{% url "edit" 0 %}'.replace('0', recordId);
+                    }
+    
+                    $.ajax({
+                        type: "POST",
+                        url: url,
+                        data: mydata,
+                        dataType: "json",
+                        success: function(data) {
+                            if (data.success === 'Save') {
+                                var newRow = '<tr>';
+                                newRow += '<td>' + data.record.id + '</td>';
+                                newRow += '<td>' + fn + '</td>';
+                                newRow += '<td>' + ln + '</td>';
+                                newRow += '<td>' + em + '</td>';
+                                newRow += '<td>' + pn + '</td>';
+                                newRow += '<td>' + cy + '</td>';
+                                newRow += '<td>';
+                                newRow += '<div class="btn-group" role="group">';
+                                newRow += '<button type="button" class="btn btn-primary btn_edit" data-sid="' + data.record.id + '">Edit</button>';
+                                newRow += '<button type="button" class="btn btn-danger btn_del" data-sid="' + data.record.id + '">Delete</button>';
+                                newRow += '</div>';
+                                newRow += '</td>';
+                                newRow += '</tr>';
+                                $('#tbodyid').append(newRow);
+                            } else if (data.success === 'Update') {
+                                var row = $('button[data-sid="' + recordId + '"]').closest('tr');
+                                row.find('td:nth-child(1)').text(recordId);
+                                row.find('td:nth-child(2)').text(fn);
+                                row.find('td:nth-child(3)').text(ln);
+                                row.find('td:nth-child(4)').text(em);
+                                row.find('td:nth-child(5)').text(pn);
+                                row.find('td:nth-child(6)').text(cy);
+                            }
+                            $("#formid")[0].reset();
+                            $("#formid").removeData('record-id');
+                        },
+                        error: function(xhr, status, error) {
+                            console.log("AJAX error: " + error);
+                        }
+                    });
+                }
+            });
+    
+            $('#tbodyid').on('click', '.btn_edit', function() {
+                var id = $(this).data('sid');
+                $.ajax({
+                    type: "GET",
+                    url: '{% url "edit" 0 %}'.replace('0', id),
+                    success: function(data) {
+                        $("#id_first_name").val(data.record.first_name);
+                        $("#id_last_name").val(data.record.last_name);
+                        $("#id_email").val(data.record.email);
+                        $("#id_phone").val(data.record.phone);
+                        $("#id_city").val(data.record.city);
+                        $("#formid").data('record-id', id);
+                    },
+                    error: function(xhr, status, error) {
+                        console.log("AJAX error: " + error);
+                    }
+                });
+            });
+    
+            $('#tbodyid').on('click', '.btn_del', function() {
+                var id = $(this).data('sid');
+                var csrfToken = $("input[name='csrfmiddlewaretoken']").val();
+                $.ajax({
+                    type: "POST",
+                    url: '{% url "delete" 0 %}'.replace('0', id),
+                    data: { csrfmiddlewaretoken: csrfToken },
+                    success: function(data) {
+                        if (data.status === 1) {
+                            $('button[data-sid="' + id + '"]').closest('tr').fadeOut(function() {
+                                $(this).remove();
+                            });
+                        } else {
+                            console.log("Unable to delete record.");
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.log("AJAX error: " + error);
+                    }
+                });
+            });
+        });
+    </script>    
+</body>
+</html>
